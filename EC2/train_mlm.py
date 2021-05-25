@@ -75,6 +75,7 @@ def main(args):
         logging_steps=args.logging_steps,
         logging_dir=args.logging_dir,
         learning_rate=args.learning_rate,
+        warmup_steps=args.warmup_steps,
         fp16=args.fp16,
         local_rank=args.local_rank
     )
@@ -86,11 +87,11 @@ def main(args):
         train_dataset=train_dataset
     )
     logger.info('Trainer initialed, start training...')
-    start = time.time()
-    trainer.train()
-    duration = time.time() - start
-    print(duration)
 
+    trainer.train()
+    if trainer.is_world_process_zero():
+        trainer.save_model(args.output_dir)
+        tokenizer.save_vocabulary(args.output_dir)
 
 if __name__ == "__main__":
     parser = ArgumentParser()
@@ -108,16 +109,18 @@ if __name__ == "__main__":
     parser.add_argument("--per_gpu_train_batch_size", type=int, default=16)
     parser.add_argument("--gradient_accumulation_steps", type=int, default=2)
     parser.add_argument("--learning_rate", type=float, default=6e-5)
-    parser.add_argument("--fp16", type=bool, default=False)
+    parser.add_argument("--warmup_steps", type=int, default=6250)
+    parser.add_argument("--fp16", type=bool, default=True)
     # utils
     parser.add_argument("--save_steps", type=int, default=10000)
     parser.add_argument("--save_total_limit", type=int, default=1)
     parser.add_argument("--logging_steps", type=int, default=10)
     parser.add_argument("--overwrite_output_dir", type=bool, default=True)
     # location setting up
-    parser.add_argument("--train_data_bucket", default="s3://yuliu-dev-east/wiki_bookcorpus_demo", type=str)
-    parser.add_argument("--logging_dir", default='./log', type=str)
+    parser.add_argument("--train_data_bucket", default="s3://yuliu-dev-east/wiki_bookcorpus_data", type=str)
+    # parser.add_argument("--logging_dir", default=os.environ['SM_OUTPUT_DATA_DIR'], type=str)
+    # parser.add_argument("--output_dir", default=os.environ['SM_OUTPUT_DATA_DIR'], type=str)
+    parser.add_argument("--logging_dir", default='./output', type=str)
     parser.add_argument("--output_dir", default='./output', type=str)
-
     args = parser.parse_args()
     main(args)

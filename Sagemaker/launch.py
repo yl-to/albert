@@ -43,9 +43,9 @@ def main():
                        "train_data_bucket": args.train_data_bucket,
                        }
     # max_run = 86400 * 2 = 172800
-    estimator = PyTorch(base_job_name=f"albert-benchmark-{args.num_nodes}nodes-p3dn-April-5-0",
+    estimator = PyTorch(base_job_name=f"albert-benchmark-{args.num_nodes}nodes-p3dn-test",
                         source_dir=".",
-                        entry_point="train_mlm.py",
+                        entry_point="dist_train.py",
                         image_uri=image_uri,
                         role=role,
                         instance_count=args.num_nodes,
@@ -58,11 +58,6 @@ def main():
                         sagemaker_session=sess,
                         max_run=259200
                         )
-    # distribution = {'smdistributed': {
-    #     'dataparallel': {
-    #         'enabled': True
-    #     }
-    # }}
 
     estimator.fit()
     print('end of the whole process')

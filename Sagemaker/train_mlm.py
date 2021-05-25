@@ -113,13 +113,12 @@ if __name__ == "__main__":
     parser.add_argument("--fp16", type=bool, default=True)
     # utils
     parser.add_argument("--save_steps", type=int, default=10000)
-    parser.add_argument("--save_total_limit", type=int, default=1)
+    parser.add_argument("--save_total_limit", type=int, default=15)
     parser.add_argument("--logging_steps", type=int, default=10)
     parser.add_argument("--overwrite_output_dir", type=bool, default=True)
     # location setting up
     parser.add_argument("--train_data_bucket", default="s3://yuliu-dev-east/wiki_bookcorpus_data", type=str)
     parser.add_argument("--logging_dir", default=os.environ['SM_OUTPUT_DATA_DIR'], type=str)
     parser.add_argument("--output_dir", default=os.environ['SM_OUTPUT_DATA_DIR'], type=str)
-
     args = parser.parse_args()
     main(args)
