@@ -38,11 +38,12 @@ def postprocess_qa_predictions(
     null_score_diff_threshold: float = 0.0,
     output_dir: Optional[str] = None,
     prefix: Optional[str] = None,
-    is_world_process_zero: bool = True,
+    log_level: Optional[int] = logging.WARNING,
 ):
     """
     Post-processes the predictions of a question-answering model to convert them to answers that are substrings of the
     original contexts. This is the base postprocessing functions for models that only return start and end logits.
+
     Args:
         examples: The non-preprocessed dataset (see the main script for more information).
         features: The processed dataset (see the main script for more information).
@@ -61,6 +62,7 @@ def postprocess_qa_predictions(
             the null answer minus this threshold, the null answer is selected for this example (note that the score of
             the null answer for an example giving several features is the minimum of the scores for the null answer on
             each feature: all features must be aligned on the fact they `want` to predict a null answer).
+
             Only useful when :obj:`version_2_with_negative` is :obj:`True`.
         output_dir (:obj:`str`, `optional`):
             If provided, the dictionaries of predictions, n_best predictions (with their scores and logits) and, if
@@ -68,8 +70,8 @@ def postprocess_qa_predictions(
             answers, are saved in `output_dir`.
         prefix (:obj:`str`, `optional`):
             If provided, the dictionaries mentioned above are saved with `prefix` added to their names.
-        is_world_process_zero (:obj:`bool`, `optional`, defaults to :obj:`True`):
-            Whether this process is the main process or not (used to determine if logging/saves should be done).
+        log_level (:obj:`int`, `optional`, defaults to ``logging.WARNING``):
+            ``logging`` log level (e.g., ``logging.WARNING``)
     """
     assert len(predictions) == 2, "`predictions` should be a tuple with two elements (start_logits, end_logits)."
     all_start_logits, all_end_logits = predictions
@@ -89,7 +91,7 @@ def postprocess_qa_predictions(
         scores_diff_json = collections.OrderedDict()
 
     # Logging.
-    logger.setLevel(logging.INFO if is_world_process_zero else logging.WARN)
+    logger.setLevel(log_level)
     logger.info(f"Post-processing {len(examples)} example predictions split into {len(features)} features.")
 
     # Let's loop over all the examples!
@@ -213,14 +215,14 @@ def postprocess_qa_predictions(
         assert os.path.isdir(output_dir), f"{output_dir} is not a directory."
 
         prediction_file = os.path.join(
-            output_dir, "predictions.json" if prefix is None else f"predictions_{prefix}".json
+            output_dir, "predictions.json" if prefix is None else f"{prefix}_predictions.json"
         )
         nbest_file = os.path.join(
-            output_dir, "nbest_predictions.json" if prefix is None else f"nbest_predictions_{prefix}".json
+            output_dir, "nbest_predictions.json" if prefix is None else f"{prefix}_nbest_predictions.json"
         )
         if version_2_with_negative:
             null_odds_file = os.path.join(
-                output_dir, "null_odds.json" if prefix is None else f"null_odds_{prefix}".json
+                output_dir, "null_odds.json" if prefix is None else f"{prefix}_null_odds.json"
             )
 
         logger.info(f"Saving predictions to {prediction_file}.")
@@ -248,12 +250,13 @@ def postprocess_qa_predictions_with_beam_search(
     end_n_top: int = 5,
     output_dir: Optional[str] = None,
     prefix: Optional[str] = None,
-    is_world_process_zero: bool = True,
+    log_level: Optional[int] = logging.WARNING,
 ):
     """
     Post-processes the predictions of a question-answering model with beam search to convert them to answers that are substrings of the
     original contexts. This is the postprocessing functions for models that return start and end logits, indices, as well as
     cls token predictions.
+
     Args:
         examples: The non-preprocessed dataset (see the main script for more information).
         features: The processed dataset (see the main script for more information).
@@ -277,8 +280,8 @@ def postprocess_qa_predictions_with_beam_search(
             answers, are saved in `output_dir`.
         prefix (:obj:`str`, `optional`):
             If provided, the dictionaries mentioned above are saved with `prefix` added to their names.
-        is_world_process_zero (:obj:`bool`, `optional`, defaults to :obj:`True`):
-            Whether this process is the main process or not (used to determine if logging/saves should be done).
+        log_level (:obj:`int`, `optional`, defaults to ``logging.WARNING``):
+            ``logging`` log level (e.g., ``logging.WARNING``)
     """
     assert len(predictions) == 5, "`predictions` should be a tuple with five elements."
     start_top_log_probs, start_top_index, end_top_log_probs, end_top_index, cls_logits = predictions
@@ -299,7 +302,7 @@ def postprocess_qa_predictions_with_beam_search(
     scores_diff_json = collections.OrderedDict() if version_2_with_negative else None
 
     # Logging.
-    logger.setLevel(logging.INFO if is_world_process_zero else logging.WARN)
+    logger.setLevel(log_level)
     logger.info(f"Post-processing {len(examples)} example predictions split into {len(features)} features.")
 
     # Let's loop over all the examples!
@@ -332,9 +335,9 @@ def postprocess_qa_predictions_with_beam_search(
             # Go through all possibilities for the `n_start_top`/`n_end_top` greater start and end logits.
             for i in range(start_n_top):
                 for j in range(end_n_top):
-                    start_index = start_indexes[i]
+                    start_index = int(start_indexes[i])
                     j_index = i * end_n_top + j
-                    end_index = end_indexes[j_index]
+                    end_index = int(end_indexes[j_index])
                     # Don't consider out-of-scope answers (last part of the test should be unnecessary because of the
                     # p_mask but let's not take any risk)
                     if (
@@ -400,24 +403,24 @@ def postprocess_qa_predictions_with_beam_search(
         assert os.path.isdir(output_dir), f"{output_dir} is not a directory."
 
         prediction_file = os.path.join(
-            output_dir, "predictions.json" if prefix is None else f"predictions_{prefix}".json
+            output_dir, "predictions.json" if prefix is None else f"{prefix}_predictions.json"
         )
         nbest_file = os.path.join(
-            output_dir, "nbest_predictions.json" if prefix is None else f"nbest_predictions_{prefix}".json
+            output_dir, "nbest_predictions.json" if prefix is None else f"{prefix}_nbest_predictions.json"
         )
         if version_2_with_negative:
             null_odds_file = os.path.join(
-                output_dir, "null_odds.json" if prefix is None else f"null_odds_{prefix}".json
+                output_dir, "null_odds.json" if prefix is None else f"{prefix}_null_odds.json"
             )
 
-        print(f"Saving predictions to {prediction_file}.")
+        logger.info(f"Saving predictions to {prediction_file}.")
         with open(prediction_file, "w") as writer:
             writer.write(json.dumps(all_predictions, indent=4) + "\n")
-        print(f"Saving nbest_preds to {nbest_file}.")
+        logger.info(f"Saving nbest_preds to {nbest_file}.")
         with open(nbest_file, "w") as writer:
             writer.write(json.dumps(all_nbest_json, indent=4) + "\n")
         if version_2_with_negative:
-            print(f"Saving null_odds to {null_odds_file}.")
+            logger.info(f"Saving null_odds to {null_odds_file}.")
             with open(null_odds_file, "w") as writer:
                 writer.write(json.dumps(scores_diff_json, indent=4) + "\n")
 

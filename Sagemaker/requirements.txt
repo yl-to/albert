@@ -1,2 +1,2 @@
-git+https://github.com/yl-to/transformers.git@mlm_albert
-tensorboard
+datasets >= 1.8.0
+torch >= 1.3.0
