@@ -1,0 +1,12 @@
+# https://github.com/aws/deep-learning-containers/blob/master/available_images.md
+# refer to the above page to pull latest Pytorch image
+
+# docker image region us-east-1
+FROM 763104351884.dkr.ecr.us-east-1.amazonaws.com/pytorch-training:1.8.1-gpu-py36-cu111-ubuntu18.04
+
+# version args
+ENV AWS_REGION=us-east-1
+
+# transformer lib
+RUN pip install git+https://github.com/yl-to/transformers.git
+
