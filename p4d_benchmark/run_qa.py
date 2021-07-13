@@ -23,6 +23,7 @@ import os
 import sys
 from dataclasses import dataclass, field
 from typing import Optional
+import time
 
 import datasets
 from datasets import load_dataset, load_metric
@@ -576,7 +577,12 @@ def main():
             checkpoint = training_args.resume_from_checkpoint
         elif last_checkpoint is not None:
             checkpoint = last_checkpoint
+        train_start = time.time()
         train_result = trainer.train(resume_from_checkpoint=checkpoint)
+        train_duration = time.time() - train_start
+        print(f'*********************************************')
+        print(f'Training time is {train_duration} sec')
+        print(f'*********************************************')
         trainer.save_model()  # Saves the tokenizer too for easy upload
 
         metrics = train_result.metrics

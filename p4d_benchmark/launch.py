@@ -13,12 +13,10 @@ def main():
     parser.add_argument('--node_type', type=str, default='ml.p3.16xlarge', help='Node type')
     #parser.add_argument('--node_type', type=str, default='ml.p3dn.24xlarge', help='Node type')
     parser.add_argument('--bucket_name', type=str, default='yuliu-dev-east-gryffindor')
-    #parser.add_argument('--train_data_bucket', type=str, default="s3://yuliu-dev-east/wiki_bookcorpus_data")
     parser.add_argument('--output_dir', type=str, default='albert_finetune')
     parser.add_argument("--image_uri", type=str,
                         default='427566855058.dkr.ecr.us-east-1.amazonaws.com/p4d_benchmark_yu:latest')
-    # model
-    parser.add_argument("--learning_rate", type=float, default=6e-5)
+
     args = parser.parse_args()
 
     # initialization
@@ -31,8 +29,7 @@ def main():
     sess = sagemaker.Session()
     print(f"Starting albert training with {args.num_nodes} nodes.")
     hyperparameters = {"num_nodes": args.num_nodes,
-                       "platform": args.platform,
-                       "learning_rate": args.learning_rate
+                       "platform": args.platform
                        }
     # max_run = 86400 * 2 = 172800
     estimator = PyTorch(base_job_name=f"p4d-benchmark-{args.num_nodes}nodes",
