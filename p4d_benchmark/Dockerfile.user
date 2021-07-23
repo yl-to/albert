@@ -8,5 +8,5 @@ FROM 763104351884.dkr.ecr.us-east-1.amazonaws.com/pytorch-training:1.8.1-gpu-py3
 ENV AWS_REGION=us-east-1
 
 # transformer lib
-RUN pip install git+https://github.com/yl-to/transformers.git
+RUN pip install git+https://github.com/yl-to/transformers.git@p4d
 
