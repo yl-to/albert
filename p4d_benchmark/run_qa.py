@@ -581,7 +581,7 @@ def main():
         train_result = trainer.train(resume_from_checkpoint=checkpoint)
         train_duration = time.time() - train_start
         print(f'*********************************************')
-        print(f'Training time is {train_duration} sec')
+        print(f'HF Training time is {train_duration} sec')
         print(f'*********************************************')
         trainer.save_model()  # Saves the tokenizer too for easy upload
 
@@ -594,11 +594,18 @@ def main():
         trainer.log_metrics("train", metrics)
         trainer.save_metrics("train", metrics)
         trainer.save_state()
+        print('train block finished')
 
     # Evaluation
     if training_args.do_eval:
         logger.info("*** Evaluate ***")
+        eval_start = time.time()
         metrics = trainer.evaluate()
+        eval_duration = time.time() - eval_start
+        print(f'*********************************************')
+        print(f'HF Evaluate time is {eval_duration} sec')
+        print(f'*********************************************')
+
 
         max_eval_samples = data_args.max_eval_samples if data_args.max_eval_samples is not None else len(eval_dataset)
         metrics["eval_samples"] = min(max_eval_samples, len(eval_dataset))
@@ -639,4 +646,9 @@ def _mp_fn(index):
 
 
 if __name__ == "__main__":
+    script_start = time.time()
     main()
+    script_duration = time.time() - script_start
+    print(f'*********************************************')
+    print(f'HF Script time is {script_duration} sec')
+    print(f'*********************************************')

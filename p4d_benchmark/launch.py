@@ -16,6 +16,8 @@ def main():
     parser.add_argument('--output_dir', type=str, default='albert_finetune')
     parser.add_argument("--image_uri", type=str,
                         default='427566855058.dkr.ecr.us-east-1.amazonaws.com/p4d_benchmark_yu:latest')
+    parser.add_argument('--per_device_train_batch_size', type=int, default=1, help='batch_size')
+    parser.add_argument('--per_device_eval_batch_size', type=int, default=1, help='batch_size')
 
     args = parser.parse_args()
 
@@ -29,7 +31,9 @@ def main():
     sess = sagemaker.Session()
     print(f"Starting albert training with {args.num_nodes} nodes.")
     hyperparameters = {"num_nodes": args.num_nodes,
-                       "platform": args.platform
+                       "platform": args.platform,
+                       "per_device_eval_batch_size": args.per_device_eval_batch_size,
+                       "per_device_train_batch_size": args.per_device_train_batch_size
                        }
     # max_run = 86400 * 2 = 172800
     estimator = PyTorch(base_job_name=f"p4d-benchmark-{args.num_nodes}nodes",

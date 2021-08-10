@@ -14,7 +14,8 @@ if __name__ == "__main__":
     parser.add_argument('--port', type=str, default='1234', help='master port to use')
     parser.add_argument('--model_type', type=str, default='albert_base')
     parser.add_argument('--platform', type=str, default='SM')
-    # parser.add_argument("--per_gpu_train_batch_size", type=int, default=3)
+    parser.add_argument('--per_device_train_batch_size', type=int, default=3)
+    parser.add_argument("--per_device_eval_batch_size", type=int, default=3)
 
     args = parser.parse_args()
     os.environ['NCCL_DEBUG'] = 'INFO'
@@ -43,8 +44,8 @@ if __name__ == "__main__":
               f"--max_seq_length 384 " \
               f"--doc_stride 128 " \
               f"--output_dir {args.output_dir} " \
-              f"--per_device_eval_batch_size=3 " \
-              f"--per_device_train_batch_size=3 "
+              f"--per_device_eval_batch_size={args.per_device_eval_batch_size} " \
+              f"--per_device_train_batch_size={args.per_device_train_batch_size} "
 
     else:
         cmd = f"python -m torch.distributed.launch --nproc_per_node={num_gpus} " \
@@ -59,8 +60,8 @@ if __name__ == "__main__":
               f"--max_seq_length 384 " \
               f"--doc_stride 128 " \
               f"--output_dir {args.output_dir} " \
-              f"--per_device_eval_batch_size=3 " \
-              f"--per_device_train_batch_size=3 "
+              f"--per_device_eval_batch_size={args.per_device_eval_batch_size}  " \
+              f"--per_device_train_batch_size={args.per_device_train_batch_size} "
 
     try:
         sb.run(cmd, shell=True)
