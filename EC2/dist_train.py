@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Get model info')
     parser.add_argument('--num_nodes', type=int, default=1, help='Number of nodes')
-    parser.add_argument('--num_gpus', type=int, default=1, help='Number of gpus')
+    parser.add_argument('--num_gpus', type=int, default=8, help='Number of gpus')
     parser.add_argument('--rank', type=int, default=0, help='Rank code')
     parser.add_argument('--output_dir', type=str, default='./ec2_output')
     parser.add_argument('--master_addr', type=str, help='master ip address')
