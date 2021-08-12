@@ -98,7 +98,6 @@ if __name__ == "__main__":
     # distributed
     parser.add_argument("--local_rank", type=int, default=-1)
     parser.add_argument("--num_nodes", type=int, default=1)
-    parser.add_argument("--platform", type=str)
     # dataset
     parser.add_argument("--max_length", type=int, default=512)
     parser.add_argument("--random_seed", type=int, default=42)

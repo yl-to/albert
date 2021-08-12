@@ -8,7 +8,6 @@ logger = logging.getLogger(__name__)
 def main():
     parser = argparse.ArgumentParser(description='run training')
     parser.add_argument('--model_type', type=str, default='albert_base')
-    parser.add_argument('--platform', type=str, default='SM', help='SM(sagemaker) or EC2')
     parser.add_argument('--num_nodes', type=int, default=1, help='Number of nodes')
     parser.add_argument('--node_type', type=str, default='ml.p3.16xlarge', help='Node type')
     parser.add_argument('--bucket_name', type=str, default='yuliu-dev-east-gryffindor')
@@ -38,7 +37,6 @@ def main():
     print(f"Starting albert training with {args.num_nodes} nodes.")
     hyperparameters = {"num_nodes": args.num_nodes,
                        "max_steps": args.max_steps,
-                       "platform": args.platform,
                        "gradient_accumulation_steps": args.gradient_accumulation_steps,
                        "learning_rate": args.learning_rate,
                        "warmup_steps": args.warmup_steps,
