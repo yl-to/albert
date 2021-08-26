@@ -10,7 +10,7 @@ def main():
     parser.add_argument('--model_type', type=str, default='albert_base')
     parser.add_argument('--platform', type=str, default='SM', help='SM(sagemaker) or EC2')
     parser.add_argument('--num_nodes', type=int, default=1, help='Number of nodes')
-    parser.add_argument('--node_type', type=str, default='ml.p3.16xlarge', help='Node type')
+    parser.add_argument('--node_type', type=str, default='ml.p4d.24xlarge', help='Node type')
     #parser.add_argument('--node_type', type=str, default='ml.p3dn.24xlarge', help='Node type')
     # p3.16xlarge, p3.8xl
     parser.add_argument('--bucket_name', type=str, default='yuliu-dev-east-gryffindor')

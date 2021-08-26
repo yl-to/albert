@@ -27,6 +27,7 @@ if __name__ == "__main__":
     rank = hosts.index(current_host)
     print(f'current rank is {rank}')
     if args.num_nodes >= 2:
+        # albert-base-v2
         cmd = f"python -m torch.distributed.launch " \
               f"--nnodes={args.num_nodes} " \
               f"--node_rank={rank} " \

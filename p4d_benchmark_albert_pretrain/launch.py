@@ -9,12 +9,14 @@ def main():
     parser = argparse.ArgumentParser(description='run training')
     parser.add_argument('--model_type', type=str, default='albert_base')
     parser.add_argument('--num_nodes', type=int, default=1, help='Number of nodes')
-    parser.add_argument('--node_type', type=str, default='ml.p3.16xlarge', help='Node type')
+    #parser.add_argument('--node_type', type=str, default='ml.p3.16xlarge', help='Node type')
+    parser.add_argument('--node_type', type=str, default='ml.p4d.24xlarge', help='Node type')
     parser.add_argument('--bucket_name', type=str, default='yuliu-dev-east-gryffindor')
     parser.add_argument('--train_data_bucket', type=str,
                         default="s3://yuliu-dev-east-gryffindor/albert-pretrain/pretrain")
     parser.add_argument('--output_dir', type=str, default='albert_output')
     parser.add_argument('--max_steps', type=int, default=100)
+    parser.add_argument('--dataloader_num_workers', type=int, default=2)
     # model
     parser.add_argument("--gradient_accumulation_steps", type=int, default=1)
     parser.add_argument("--learning_rate", type=float, default=6e-5)
@@ -42,6 +44,7 @@ def main():
                        "warmup_steps": args.warmup_steps,
                        "per_gpu_train_batch_size": args.per_gpu_train_batch_size,
                        "train_data_bucket": args.train_data_bucket,
+                       "dataloader_num_workers": args.dataloader_num_workers
                        }
     # max_run = 86400 * 2 = 172800
     estimator = PyTorch(base_job_name=f"albert-benchmark-{args.num_nodes}nodes-test",

@@ -26,12 +26,17 @@ class s3_dataset(IterableDataset):
     def __init__(self, urls):
         self.urls = urls
         self.dataset = S3IterableDataset(urls, shuffle_urls=True)
+        self.file_count = 0
 
     def data_generator(self):
         try:
             while True:
+                start_time = time.time()
                 filename, fileobj = next(self.dataset_iter)
+                download_start_time = time.time()
                 examples = torch.load(io.BytesIO(fileobj))
+                load_time = time.time() - download_start_time
+                print(f'current file is {filename}, download time is {download_start_time - start_time}, load time is {load_time}')
                 for example in examples:
                     yield example
 
@@ -77,7 +82,8 @@ def main(args):
         learning_rate=args.learning_rate,
         warmup_steps=args.warmup_steps,
         fp16=args.fp16,
-        local_rank=args.local_rank
+        local_rank=args.local_rank,
+        dataloader_num_workers=args.dataloader_num_workers
     )
 
     trainer = Trainer(
@@ -111,6 +117,7 @@ if __name__ == "__main__":
     parser.add_argument("--warmup_steps", type=int, default=6250)
     parser.add_argument("--fp16", type=bool, default=True)
     # utils
+    parser.add_argument('--dataloader_num_workers', type=int, default=2)
     parser.add_argument("--save_steps", type=int, default=10000)
     parser.add_argument("--save_total_limit", type=int, default=15)
     parser.add_argument("--logging_steps", type=int, default=10)

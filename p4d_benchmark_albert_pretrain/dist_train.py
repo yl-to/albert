@@ -19,6 +19,7 @@ if __name__ == "__main__":
     parser.add_argument("--learning_rate", type=float, default=5e-5)
     parser.add_argument("--per_gpu_train_batch_size", type=int, default=16)
     parser.add_argument("--train_data_bucket", default="s3://yuliu-dev-east-gryffindor/albert-pretrain/demo", type=str)
+    parser.add_argument('--dataloader_num_workers', type=int, default=2)
 
     args = parser.parse_args()
     os.environ['AWS_REGION'] = 'us-east-1'
@@ -38,6 +39,7 @@ if __name__ == "__main__":
               f"--master_addr={hosts[0]} " \
               f"--master_port={args.port} " \
               f"train_mlm.py " \
+              f"--dataloader_num_workers {args.dataloader_num_workers} " \
               f"--model_type {args.model_type} " \
               f"--num_nodes {args.num_nodes} " \
               f"--max_steps {args.max_steps} " \
@@ -53,6 +55,7 @@ if __name__ == "__main__":
         cmd = f"python -m torch.distributed.launch " \
               f"--nproc_per_node={num_gpus} " \
               f"train_mlm.py " \
+              f"--dataloader_num_workers {args.dataloader_num_workers} " \
               f"--model_type {args.model_type} " \
               f"--num_nodes {args.num_nodes} " \
               f"--max_steps {args.max_steps} " \
