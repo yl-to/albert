@@ -1,11 +1,11 @@
 from transformers import (
     AlbertConfig,
     AlbertTokenizer,
-    AlbertForPreTraining,
     DataCollatorForLanguageModeling,
     Trainer,
     TrainingArguments
 )
+from model import AlbertForPreTrainingMLM
 from argparse import ArgumentParser
 import logging
 import time
@@ -67,7 +67,7 @@ def main(args):
         tokenizer=tokenizer, mlm=True, mlm_probability=args.mlm_probability
     )
 
-    model = AlbertForPreTraining(config=albert_base_configuration)
+    model = AlbertForPreTrainingMLM(config=albert_base_configuration)
 
     training_args = TrainingArguments(
         output_dir=args.output_dir,

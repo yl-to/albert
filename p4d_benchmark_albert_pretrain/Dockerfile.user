@@ -4,12 +4,9 @@
 # docker image region us-east-1
 FROM 763104351884.dkr.ecr.us-east-1.amazonaws.com/pytorch-training:1.8.1-gpu-py36-cu111-ubuntu18.04
 
-LABEL maintainer="Amazon AI"
-LABEL dlc_major_version="0.1"
-
 # version args
-ARG TRANSFORMERS_VERSION==4.4.2
-ARG DATASETS_VERSION==1.5.0
+ARG TRANSFORMERS_VERSION==4.10.0
+ARG DATASETS_VERSION==1.11.0
 ENV AWS_REGION=us-east-1
 
 RUN aws s3 cp s3://aws-s3-plugin/binaries/0.0.1/93fdaed/awsio-0.0.1-cp36-cp36m-manylinux1_x86_64.whl .
@@ -20,5 +17,4 @@ RUN mkdir -p /etc/pki/tls/certs && cp /etc/ssl/certs/ca-certificates.crt /etc/pk
 RUN pip install --no-cache-dir \
 	transformers[sklearn,sentencepiece]==${TRANSFORMERS_VERSION} \
 	datasets==${DATASETS_VERSION}
-RUN pip uninstall transformers -y && pip install git+https://github.com/yl-to/transformers.git@mlm_albert
 RUN apt-get update && apt install git-lfs

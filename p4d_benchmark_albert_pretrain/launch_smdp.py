@@ -1,8 +1,8 @@
 import argparse
 import logging
 import sagemaker
-from sagemaker.pytorch import PyTorch
-
+# from sagemaker.pytorch import PyTorch
+from sagemaker.huggingface import HuggingFace
 logger = logging.getLogger(__name__)
 
 def main():
@@ -24,7 +24,7 @@ def main():
     parser.add_argument("--per_gpu_train_batch_size", type=int, default=8)
     # parser.add_argument("--role", type=str, help="sagemaker_execution_role")
     parser.add_argument("--image_uri", type=str,
-                        default='427566855058.dkr.ecr.us-east-1.amazonaws.com/albert_pretrain:latest')
+                        default='427566855058.dkr.ecr.us-east-1.amazonaws.com/albert_pretrain:hf_1.8.1dlc_base')
     args = parser.parse_args()
 
     # initialization
@@ -48,7 +48,7 @@ def main():
                        "dataloader_num_workers": args.dataloader_num_workers
                        }
     # max_run = 86400 * 2 = 172800
-    estimator = PyTorch(base_job_name=f"albert-benchmark-{args.num_nodes}nodes-smdp-test",
+    estimator = HuggingFace(base_job_name=f"albert-n{args.num_nodes}-smdp-dnw{args.dataloader_num_workers}-bs{args.per_gpu_train_batch_size}",
                         source_dir=".",
                         entry_point="train_mlm.py",
                         image_uri=image_uri,
@@ -62,7 +62,8 @@ def main():
                         output_path=output_dir_s3_addr,
                         sagemaker_session=sess,
                         max_run=259200,
-                        distribution={"smdistributed": {"dataparallel": {"enabled": True}}}
+                        distribution={"smdistributed": {"dataparallel": {"enabled": True}}},
+                        py_version='py36'
                         )
 
     estimator.fit()
